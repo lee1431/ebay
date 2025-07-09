@@ -1,39 +1,54 @@
-import json, os, requests
+import json, os
+from PIL import Image
+import requests
 
-# 설정
-BATCH_SIZE = 4
+# 경로 설정
+ITEMS_JSON = 'items.json'
+INDEX_JSON = 'rotation_index.json'
+OUTPUT_DIR = 'output'
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# 데이터 로드
-with open('items.json', 'r') as f:
+# 아이템 데이터 로드
+with open(ITEMS_JSON, 'r') as f:
     items = json.load(f)
 
-with open('rotation_index.json', 'r') as f:
-    index_data = json.load(f)
+# rotation_index.json 없으면 초기화
+if not os.path.exists(INDEX_JSON):
+    index_data = {"current_index": 0, "total_items": len(items)}
+    with open(INDEX_JSON, 'w') as f:
+        json.dump(index_data, f)
+else:
+    with open(INDEX_JSON, 'r') as f:
+        index_data = json.load(f)
 
 i = index_data["current_index"]
 total = index_data["total_items"]
-subset = items[i:i+BATCH_SIZE]
-if len(subset) < BATCH_SIZE:
-    subset += items[:BATCH_SIZE - len(subset)]
+batch = 4
 
-# 폴더 생성
-os.makedirs("output", exist_ok=True)
+# 다음 4개 아이템 선택
+subset = items[i:i+batch]
+if len(subset) < batch:
+    subset += items[:batch - len(subset)]
 
-# 처리
+# 이미지 및 HTML 저장
 for idx, item in enumerate(subset):
     image_url = item["image"]
     item_url = item["itemWebUrl"]
 
-    # 썸네일 이미지 저장
-    img_data = requests.get(image_url).content
-    with open(f'output/thumb{idx+1}.jpg', 'wb') as f:
-        f.write(img_data)
+    # 이미지 저장
+    img_path = os.path.join(OUTPUT_DIR, f"thumb{idx+1}.jpg")
+    with open(img_path, 'wb') as img_file:
+        img_file.write(requests.get(image_url).content)
 
-    # HTML 링크 파일 생성
-    with open(f'output/go{idx+1}.html', 'w') as f:
-        f.write(f'<meta http-equiv="refresh" content="0;url={item_url}">')
+    # HTML 저장
+    html_path = os.path.join(OUTPUT_DIR, f"go{idx+1}.html")
+    with open(html_path, 'w', encoding='utf-8') as f:
+        f.write(f'<meta http-equiv="refresh" content="0; url={item_url}">')
+
+    print(f"Saved: {img_path}, {html_path}")
 
 # 인덱스 갱신
-index_data["current_index"] = (i + BATCH_SIZE) % total
-with open('rotation_index.json', 'w') as f:
+next_index = (i + batch) % total
+index_data['current_index'] = next_index
+with open(INDEX_JSON, 'w') as f:
     json.dump(index_data, f)
