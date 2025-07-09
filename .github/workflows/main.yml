@@ -31,7 +31,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add go*.html thumb*.jpg rotation_index.json
+          git add go*.html thumb*.jpg items.json
           git commit -m "🔁 이미지 회전 및 HTML 업데이트"
           git push
         env:
