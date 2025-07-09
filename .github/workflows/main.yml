@@ -1,36 +1,33 @@
-name: Update Title Images
+name: Rotate eBay Items
 
 on:
   schedule:
-    - cron: '0 * * * *'   # 매 정각마다 실행
-  workflow_dispatch:        # 수동 실행도 가능
-
-permissions:
-  contents: write           # ✅ push 권한 허용
+    - cron: '0 * * * *'  # 매시간 0분마다 실행
+  workflow_dispatch:      # 수동 실행도 가능
 
 jobs:
-  build:
+  rotate:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+    - name: Install dependencies
+      run: pip install requests
 
-      - name: Run script
-        run: python update_titles.py
+    - name: Run rotation script
+      run: python rotate_items.py
 
-      - name: Commit and push new images
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add title*.png thumb*.jpg
-          git commit -m "자동 생성된 상품명 및 썸네일 이미지 업데이트" || echo "No changes to commit"
-          git push
+    - name: Commit and push updates
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git add output/
+        git commit -m "🔄 Auto-update: item rotation"
+        git push
