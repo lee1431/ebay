@@ -16,6 +16,7 @@ HEADERS = {
 # 검색 URL (카테고리 없이 전체 셀러 상품 조회)
 SEARCH_URL = 'https://api.ebay.com/buy/browse/v1/item_summary/search'
 PARAMS = {
+    'q': 'fishing',
     'filter': f'seller:{SELLER_ID}',
     'limit': '50'
 }
