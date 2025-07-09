@@ -18,7 +18,7 @@ def fetch_items():
         'RESPONSE-DATA-FORMAT': 'JSON',
         'itemFilter(0).name': 'Seller',
         'itemFilter(0).value': SELLER_ID,
-        'paginationInput.entriesPerPage': '20'
+        'paginationInput.entriesPerPage': '10'
     }
     response = requests.get(url, params=params)
     data = response.json()
