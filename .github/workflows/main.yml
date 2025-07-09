@@ -1,33 +1,38 @@
-name: Rotate eBay Items
+name: Rotate Item Images
 
 on:
   schedule:
-    - cron: '0 * * * *'  # 매시간 0분마다 실행
-  workflow_dispatch:      # 수동 실행도 가능
+    - cron: '0 * * * *'
+  workflow_dispatch:
 
 jobs:
-  rotate:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
 
-    - name: Install dependencies
-      run: pip install requests
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-    - name: Run rotation script
-      run: python rotate_items.py
+      - name: Run rotation script
+        run: python rotate_items.py
 
-    - name: Commit and push updates
-      run: |
-        git config user.name "github-actions[bot]"
-        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git add output/
-        git commit -m "🔄 Auto-update: item rotation"
-        git push
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add go*.html thumb*.jpg rotation_index.json
+          git commit -m "🔁 이미지 회전 및 HTML 업데이트"
+          git push
+        env:
+          # GitHub token으로 인증
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
