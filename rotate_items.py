@@ -5,6 +5,19 @@ import urllib.request
 with open('items.json', 'r') as f:
     items = json.load(f)
 
+# rotation_index.json이 없으면 새로 만든다
+if not os.path.exists("rotation_index.json"):
+    with open("items.json", "r") as f:
+        items = json.load(f)
+    total_items = len(items)
+    index_data = {
+        "current_index": 0,
+        "total_items": total_items
+    }
+    with open("rotation_index.json", "w") as f:
+        json.dump(index_data, f, indent=2)
+    print("rotation_index.json 새로 생성 완료")
+
 with open('rotation_index.json', 'r') as f:
     index_data = json.load(f)
 
