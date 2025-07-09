@@ -23,7 +23,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-     - name: Run fetch_items.py
+      - name: Run fetch_items.py
         run: python fetch_items.py
 
       - name: Run rotate_items.py
