@@ -5,8 +5,8 @@ import random
 from PIL import Image, ImageDraw, ImageFont
 import os
 
-APP_ID = 'YOUR_APP_ID'  # <- 여기에 본인의 Production App ID 입력
-SELLER_ID = 'YOUR_SELLER_ID'
+APP_ID = 'LeeSangH-Getiteml-PRD-b8e9febd8-c63bdb17'  # <- 여기에 본인의 Production App ID 입력
+SELLER_ID = 'anglingcentre'
 
 # eBay Finding API로 상품 가져오기
 def fetch_items():
