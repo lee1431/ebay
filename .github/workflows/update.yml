@@ -1,16 +1,16 @@
-name: Update Rotating Items
+name: Update Title Images
 
 on:
   schedule:
-    - cron: '0 * * * *'
+    - cron: '0 * * * *'  # 매시간 정각마다 실행
   workflow_dispatch:
 
 jobs:
-  rotate-items:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Set up Python
@@ -19,19 +19,15 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install requests Pillow
+        run: pip install -r requirements.txt
 
-      - name: Run rotating script
-        env:
-          EBAY_APP_ID: ${{ secrets.EBAY_APP_ID }}
-          EBAY_ACCESS_TOKEN: ${{ secrets.EBAY_ACCESS_TOKEN }}
-        run: |
-          python fetch_items.py
+      - name: Run script
+        run: python main.py
 
-      - name: Commit and push
+      - name: Commit and push new images and html
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add title*.png thumb*.jpg rotation_index.json
-          git commit -m "🔄 자동 이미지 로테이션 업데이트" || echo "No changes to commit"
+          git add title*.png go*.html
+          git commit -m "자동 생성된 이미지 및 HTML 업데이트"
           git push
