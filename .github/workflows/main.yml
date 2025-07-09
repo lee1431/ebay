@@ -2,8 +2,11 @@ name: Update Title Images
 
 on:
   schedule:
-    - cron: '0 * * * *'
-  workflow_dispatch:
+    - cron: '0 * * * *'   # 매 정각마다 실행
+  workflow_dispatch:        # 수동 실행도 가능
+
+permissions:
+  contents: write           # ✅ push 권한 허용
 
 jobs:
   build:
@@ -28,6 +31,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add title*.png
-          git commit -m "자동 생성된 상품명 이미지 업데이트"
+          git add title*.png thumb*.jpg
+          git commit -m "자동 생성된 상품명 및 썸네일 이미지 업데이트" || echo "No changes to commit"
           git push
