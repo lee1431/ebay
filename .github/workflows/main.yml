@@ -26,6 +26,9 @@ jobs:
       - name: Run fetch_items.py
         run: python fetch_items.py
 
+      - name: Run rotate_items.py
+        run: python rotate_items.py
+
 
       - name: Commit and push changes
         run: |
