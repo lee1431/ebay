@@ -1,54 +1,48 @@
-import json, os
-from PIL import Image
-import requests
+import json
+import os
+import urllib.request
 
-# 경로 설정
-ITEMS_JSON = 'items.json'
-INDEX_JSON = 'rotation_index.json'
-OUTPUT_DIR = 'output'
-os.makedirs(OUTPUT_DIR, exist_ok=True)
-
-# 아이템 데이터 로드
-with open(ITEMS_JSON, 'r') as f:
+with open('items.json', 'r') as f:
     items = json.load(f)
 
-# rotation_index.json 없으면 초기화
-if not os.path.exists(INDEX_JSON):
-    index_data = {"current_index": 0, "total_items": len(items)}
-    with open(INDEX_JSON, 'w') as f:
-        json.dump(index_data, f)
-else:
-    with open(INDEX_JSON, 'r') as f:
-        index_data = json.load(f)
+with open('rotation_index.json', 'r') as f:
+    index_data = json.load(f)
+
+total = index_data["total_items"]
+
+if total == 0:
+    print("❌ items.json에 유효한 항목이 없습니다. fetch_items.py 확인 필요.")
+    exit(1)
 
 i = index_data["current_index"]
-total = index_data["total_items"]
 batch = 4
 
-# 다음 4개 아이템 선택
-subset = items[i:i+batch]
+# 다음 4개 추출
+subset = items[i:i + batch]
 if len(subset) < batch:
-    subset += items[:batch - len(subset)]
+    subset += items[:batch - len(subset)]  # 순환 처리
 
-# 이미지 및 HTML 저장
+# 이미지 저장 및 링크 생성
+html_lines = ["<html><body><h1>추천 상품</h1>"]
 for idx, item in enumerate(subset):
-    image_url = item["image"]
-    item_url = item["itemWebUrl"]
+    title = item["title"]
+    image = item["image"]
+    url = item["itemWebUrl"]
+    filename = f"thumb{idx + 1}.jpg"
 
-    # 이미지 저장
-    img_path = os.path.join(OUTPUT_DIR, f"thumb{idx+1}.jpg")
-    with open(img_path, 'wb') as img_file:
-        img_file.write(requests.get(image_url).content)
+    urllib.request.urlretrieve(image, filename)
+    print(f"{filename} 저장 완료: {title}")
 
-    # HTML 저장
-    html_path = os.path.join(OUTPUT_DIR, f"go{idx+1}.html")
-    with open(html_path, 'w', encoding='utf-8') as f:
-        f.write(f'<meta http-equiv="refresh" content="0; url={item_url}">')
+    html_lines.append(f'<a href="{url}" target="_blank"><img src="{filename}" width="225"></a>')
 
-    print(f"Saved: {img_path}, {html_path}")
+html_lines.append("</body></html>")
+
+with open("go1.html", "w") as f:
+    f.write("\n".join(html_lines))
+print("✅ go1.html 생성 완료")
 
 # 인덱스 갱신
 next_index = (i + batch) % total
 index_data['current_index'] = next_index
-with open(INDEX_JSON, 'w') as f:
+with open('rotation_index.json', 'w') as f:
     json.dump(index_data, f)
